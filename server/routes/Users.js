@@ -19,6 +19,7 @@ const transporter = nodemailer.createTransport({
 
 router.post("/register", async (req, res) => {
   const { username, password, email, firstName, lastName } = req.body;
+  console.log('RECIEVED');
   bcrypt.hash(password, 10).then((hash) => {
     Users.create({
       username: username,

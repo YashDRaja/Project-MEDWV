@@ -65,6 +65,7 @@ router.get("/account-posts", validateToken, async (req, res) => {
 router.put("/edit/:id", validateOptionalToken, upload.array('file'), async (req,res) => {
   const id = req.params.id;
   const post = await Posts.findByPk(id);
+  
   if (!req.user) {
     res.json({ error: "Not Signed in" });
   } else {
@@ -74,13 +75,32 @@ router.put("/edit/:id", validateOptionalToken, upload.array('file'), async (req,
       post.location = req.body.location;
       post.admission = req.body.admission;
       if (req.files[0]) {
-        post.image = req.files[0].filename;
+        let filename = uuid.v4();
+        var idxDot = req.files[0].originalname.lastIndexOf(".");
+        filename+= req.files[0].originalname.substr(idxDot, req.files[0].originalname.length).toLowerCase();
+        post.image = filename;
+        await post.save();
+        const s3Client = s3;
+        const params = uploadParams;
+    
+        params.Key = filename;
+        params.Body = req.files[0].buffer;
+        s3Client.upload(params, (err, data) => {
+          if (err) {
+            console.log(err);
+            res.status(500).json({ error: err });
+          } else {
+            res.json({ message: "successfully uploaded" })
+          }
+          
+        })
       } else {
-        console.log("ok");
+        await post.save();
+        res.json("updated no change in img");
       }
       
-      await post.save();
-      res.json("updated");
+      
+      
     } else {
       res.json({error: "User and Post Creator are different"});
     }
@@ -119,10 +139,8 @@ router.post("/create", validateToken, upload.array('file'), async (req, res) => 
 
     params.Key = filename;
     params.Body = req.files[0].buffer;
-    console.log(params);
     s3Client.upload(params, (err, data) => {
       if (err) {
-        console.log(err);
         res.status(500).json({ error: err });
       } else (
         res.json({ message: "successfully uploaded" })
