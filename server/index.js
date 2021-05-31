@@ -10,7 +10,7 @@ app.use('/images', express.static('uploads'))
 app.use(express.static(path.join(__dirname, '../client/build')));
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({credentials:true, origin: "https://project-medwv.yashr.me"}));
+app.use(cors({credentials:true, origin: "https://yashr.me"}));
 
 const db = require("./models");
 
