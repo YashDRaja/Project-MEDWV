@@ -42,7 +42,7 @@ services:
       - web-root:/var/www/html
     depends_on:
       - webserver
-    command: certonly --webroot --webroot-path=/var/www/html --email yraja@uwaterloo.ca --agree-tos --no-eff-email --force-renewal -d project-medwv.yashr.me
+    command: certonly --webroot --webroot-path=/var/www/html --email yraja@uwaterloo.ca --agree-tos --no-eff-email --force-renewal -d yashr.me -d project-medwv.yashr.me
 
 volumes:
   data:
